@@ -10,7 +10,7 @@ metadata:
 ## 名称与版本
 
 - skill_name: chinese-poetry-writing
-- version: v0.1-beta（构建进度见 BUILD_STATE.md）
+- version: v0.1-beta
 - 性质：BETA。提供已验证的方法，不宣称审美模型已经客观完备。
 
 ## 职责（COMPOSE / CRITIQUE / REVISE / ORCHESTRATE）
@@ -70,7 +70,7 @@ OUTPUT
 
 ## Prosody 集成
 
-- 完成审美稿后调用已安装的 `chinese-poetry-prosody`；Codex 默认安装位置为 `$CODEX_HOME/skills/chinese-poetry-prosody/`（通常是 `~/.codex/skills/chinese-poetry-prosody/`）。
+- 完成审美稿后调用已安装的 `chinese-poetry-prosody`；个人级 Codex Skill 默认放在 `$HOME/.agents/skills/chinese-poetry-prosody/`。
 - 调用方式（以其 SKILL.md 为准）：
   `py scripts/check_poem.py --poem "<诗>" [--form jueju5|jueju7] [--reading 行:列=拼音] [--rhyme-profile xinyun18]`
 - 判定：PASS 可交付；WARN 按提示决定是否处理；FAIL 必须修订对应句后复检。
