@@ -1,3 +1,10 @@
+---
+name: chinese-poetry-writing
+description: 中文诗歌创作方法 Skill，负责中文诗歌的构思、创作、批评、修订与全流程调度；适用于写诗、作诗、五绝、七绝、古诗、格律诗、命题诗、润色诗、改诗、点评诗稿等请求。仅查询押韵、平仄、韵部、合律或多音字读音时，应交给 chinese-poetry-prosody。
+metadata:
+  version: "0.1-beta"
+---
+
 # chinese-poetry-writing —— 中文诗歌创作方法 Skill（v0.1-beta）
 
 ## 名称与版本
@@ -63,7 +70,7 @@ OUTPUT
 
 ## Prosody 集成
 
-- 完成审美稿后调用 chinese-poetry-prosody 验律；本机位置：`~/.kun/skills/chinese-poetry-prosody/`。
+- 完成审美稿后调用已安装的 `chinese-poetry-prosody`；Codex 默认安装位置为 `$CODEX_HOME/skills/chinese-poetry-prosody/`（通常是 `~/.codex/skills/chinese-poetry-prosody/`）。
 - 调用方式（以其 SKILL.md 为准）：
   `py scripts/check_poem.py --poem "<诗>" [--form jueju5|jueju7] [--reading 行:列=拼音] [--rhyme-profile xinyun18]`
 - 判定：PASS 可交付；WARN 按提示决定是否处理；FAIL 必须修订对应句后复检。
