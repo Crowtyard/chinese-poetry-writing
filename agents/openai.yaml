@@ -1,0 +1,4 @@
+interface:
+  display_name: "中文诗歌创作"
+  short_description: "中文诗歌构思、创作、批评与修订"
+  default_prompt: "使用 chinese-poetry-writing 完成中文诗歌的构思、创作、批评或修订；格律与押韵判定交给 chinese-poetry-prosody。"
