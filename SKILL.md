@@ -12,6 +12,8 @@ metadata:
 - skill_name: chinese-poetry-writing
 - version: v0.1-beta
 - 性质：BETA。提供已验证的方法，不宣称审美模型已经客观完备。
+- 集成状态：v0.1-beta + MINIMUM_PRODUCT_INTEGRATION_V1（运行时教学资产已接入
+  `references/runtime_teaching/`，接入范围与档位见「Runtime Teaching」一节）。
 
 ## 职责（COMPOSE / CRITIQUE / REVISE / ORCHESTRATE）
 
@@ -43,6 +45,13 @@ metadata:
 ```
 USER_REQUEST
 ↓
+PREMISE STATUS CHECK（条件式，非必经 Gate；细则见 protocols/orchestration.md 步骤 0）
+  输入已含具体处境／关系／stake → 继续（跳过 Formation）
+  否则 → 轻量初始 Discovery 探针
+    Discovery 已带 stake → 继续
+    仍是纯观察 → PREMISE_FORMATION（references/runtime_teaching/premise_formation.md）
+    找不到自然 Premise → NO_POEM_DIRECTION（合法出口，不编故事）
+↓
 COMPOSE
   FACT
   IRREPLACEABLE_FACT
@@ -68,6 +77,29 @@ OUTPUT
 - 内部分析（FACT/DISCOVERY/CRITIQUE 过程）默认不展示给用户；仅输出诗与必要说明。
 - 迭代上限：构思 ≤3 轮；批评-修订 ≤3 轮；修律 ≤5 轮。不收敛则如实报告 UNRESOLVED。
 
+## Runtime Teaching（MINIMUM_PRODUCT_INTEGRATION_V1）
+
+资产目录：`references/runtime_teaching/`（critic 校准资产 + premise formation 压缩资产）。
+执行协议仍只有 `protocols/critique.md`；该目录是被取用的材料，不是规则清单。
+
+纪律：**DEFAULT AVAILABLE ≠ LOAD EVERYTHING**。按当前诊断问题只取最相关的一项，不整包加载；
+`failure_index_retrieval.md` 只是案例检索索引，**绝不**作为逐项 checklist。
+
+| 档位 | 何时 | 加载 |
+|---|---|---|
+| MINIMAL | 普通批评／交付前自查 | critique protocol + 最相关的 1 个 contrast |
+| STANDARD | 已有明确怀疑方向 | 1-2 个相关 contrast；仅怀疑打油感／散文压缩时才加 critic_acoustics.md |
+| DEEP | 疑难、多轮不收敛、需历史近似案例校准 | 允许检索 failure_index_retrieval.md + 多个 contrast |
+
+- Critic 有三档合法判决，`NO_MATERIAL_PROBLEM` 合法；`LOCAL_RISK != POEM_FAILURE`；
+  过度解释受 `INTERPRETIVE_OVERREACH_GUARD` 约束（细则见 protocols/critique.md）。
+- Premise Formation 是**条件式**步骤：仅当裸题且初始 Discovery 仍是纯观察时调用；
+  用户输入已含具体处境／关系／stake，或 Discovery 自身已带 stake → 跳过。
+  找不到自然 Premise → 允许 `NO_POEM_DIRECTION`，不编故事。
+- **未接入（保持实验态）**：Composer Teaching、Reviser Trajectory Teaching
+  （`COMPOSER_TEACHING = EXPERIMENTAL_NOT_RUNTIME`／`REVISER_TEACHING = EXPERIMENTAL_NOT_RUNTIME`）。
+  研究仓文件存在也不自动读取。既有原则继续有效：`POETIC_EYE_PRESERVED`；修律可撤回（prosody repair may be rolled back）。
+
 ## Prosody 集成
 
 - 完成审美稿后调用已安装的 `chinese-poetry-prosody`；个人级 Codex Skill 默认放在 `$HOME/.agents/skills/chinese-poetry-prosody/`。
@@ -92,5 +124,7 @@ OUTPUT
 - protocols/compose.md｜critique.md｜revise.md｜orchestration.md —— 执行细则
 - references/poetic_discovery.md｜relational_imagery.md｜omission_vs_missing.md｜
   endings.md｜bad_poetry_patterns.md｜user_soft_preferences.md —— 判据与速查
+- references/runtime_teaching/ —— critic_contrasts.md｜critic_acoustics.md｜
+  failure_index_retrieval.md｜premise_formation.md —— 运行时教学资产（按档位取用，不整包加载）
 - examples/liked_examples.md｜failure_examples.md —— 真人裁决样本（可学不可抄）
 - tests/smoke_cases.md —— 冒烟用例清单（v0.1-beta 验收）
