@@ -12,8 +12,9 @@ metadata:
 - skill_name: chinese-poetry-writing
 - version: v0.1-beta
 - 性质：BETA。提供已验证的方法，不宣称审美模型已经客观完备。
-- 集成状态：v0.1-beta + MINIMUM_PRODUCT_INTEGRATION_V1（运行时教学资产已接入
-  `references/runtime_teaching/`，接入范围与档位见「Runtime Teaching」一节）。
+- 集成状态：v0.1-beta + MINIMUM_PRODUCT_INTEGRATION_V1 + AFFECTIVE_INTENT_FLOW_V1（运行时教学资产已接入
+  `references/runtime_teaching/`，接入范围与档位见「Runtime Teaching」一节；主流程新增
+  AFFECTIVE INTENT 写作准备步骤，见「AFFECTIVE INTENT（思想感情方向）」一节）。
 
 ## 职责（COMPOSE / CRITIQUE / REVISE / ORCHESTRATE）
 
@@ -52,7 +53,11 @@ PREMISE STATUS CHECK（条件式，非必经 Gate；细则见 protocols/orchestr
     仍是纯观察 → PREMISE_FORMATION（references/runtime_teaching/premise_formation.md）
     找不到自然 Premise → NO_POEM_DIRECTION（合法出口，不编故事）
 ↓
-COMPOSE
+AFFECTIVE INTENT（思想感情方向；写作准备步骤，非 Gate；细则见下节与 orchestration 步骤 0.5）
+  这个处境里真正牵动人的是什么 / 本诗准备承载什么思想感情 / 哪些事实物象能承载它
+  自然形成 → 继续；情感很轻 → 同样合法；找不到自然方向 → 继续寻找或 NO_POEM_DIRECTION（不硬贴模板）
+↓
+COMPOSE（FACT / DISCOVERY / RELATION / CONCEPT 均受 AFFECTIVE INTENT 约束）
   FACT
   IRREPLACEABLE_FACT
   DISCOVERY（≥3）
@@ -76,6 +81,51 @@ OUTPUT
 
 - 内部分析（FACT/DISCOVERY/CRITIQUE 过程）默认不展示给用户；仅输出诗与必要说明。
 - 迭代上限：构思 ≤3 轮；批评-修订 ≤3 轮；修律 ≤5 轮。不收敛则如实报告 UNRESOLVED。
+
+## AFFECTIVE INTENT（思想感情方向 / AFFECTIVE_INTENT_FLOW_V1）
+
+位置：PREMISE STATUS CHECK 之后、COMPOSE 之前。执行细则见 `protocols/orchestration.md` 步骤 0.5；
+写作层约束见 `protocols/compose.md`；Critic 侧只多问一个问题（见 `protocols/critique.md`）。
+
+它补的是 Premise 没有回答的那一层：
+`Premise: 为什么这件事值得写？` → `Affective Intent: 这个具体处境里真正牵动人的是什么？这首诗准备承载什么思想感情？`
+
+只回答三个问题（运行时内部完成，默认不展示给用户；不扩展成 10/20 条 checklist）：
+
+```text
+1. 这个具体题材／处境中，真正触动人的是什么？
+2. 从这个处境自然生长出来的主要思想感情是什么？
+3. 哪些事实、动作、关系、物象能够承载这种感情，而不必把感情直接解释出来？
+```
+
+- **不是 Gate**：无 PASS／FAIL，不参与通过／不通过判定，不产生阻断；产物是一句内部写作方向。
+- 产物必须真正约束后续：FACT／DISCOVERY／RELATION／CONCEPT **优先选择能够承载当前方向的
+  事实与关系**；具体但与情感无关的事实**可以舍弃**（要修的正是「事实具体，但没有情感必要性」）。
+
+核心纪律：
+
+1. `AFFECTIVE_INTENT != EMOTION_WORDS` —— 先明确思想感情，不等于把悲伤／孤独／思念／惆怅／
+   人生／命运／岁月／成长这些词直接塞进诗里。情感应影响的是 WHAT TO NOTICE / WHAT TO SELECT /
+   WHAT TO OMIT / HOW RELATIONS ARE ORGANISED / WHERE THE POEM STOPS。
+2. 感情藏在诗里：优先通过人与物的关系、人与人的关系、现在与过去的差异、动作未完成、
+   熟悉之物与缺席之人的反差、物象变化、语气、节奏、留白、结尾位置让它出现。
+   思想感情是内部写作方向，**不要求**作为抽象词直接出现在诗中。
+   目标：`READER_FEELS_IT_BEFORE_THE_POEM_EXPLAINS_IT`。
+3. 情感不是单标签：允许「怀念＋悲戚」「亲昵＋怅惘」「喜悦＋不舍」「安静＋满足」「荒诞＋讽刺」这类复合，
+   但**不强制**双情绪；只需准确描述当前诗真正要承载的感受或认识。**克制不等于没有感情。**
+4. 「思想」不等于强行上价值：对关系的认识、某一刻突然意识到什么、对变化的体会、
+   对人的处境的理解都算；不得默认升级成人生哲理／社会寓言／命运思考／时间宏论。
+5. `AFFECTIVE_TEMPLATE_GUARD`（禁止机械映射）：夜晚 ≠ 自动孤独；下雨 ≠ 自动惆怅；秋天 ≠ 自动悲凉；
+   故乡 ≠ 自动思乡；老人 ≠ 自动怀念；死亡 ≠ 自动哭诉。
+   思想感情必须从「具体处境 ＋ 实际关系 ＋ 事实变化」自然产生。
+   （与 `references/runtime_teaching/premise_formation.md` 的 `EMOTION_TEMPLATE_GUARD` 同族：
+   那条约束 Premise 阶段，本条约束情感方向阶段。）
+6. `FORCED_SIGNIFICANCE_GUARD` 继续有效，并同样适用于本步：题材本身情感弱时，**不得**为了
+   「必须有思想感情」强造多年未归／父母去世／分手／疾病／人生遗憾／童年伤痛／身份焦虑等
+   输入并不支持的事实。允许情感很轻，也允许 `NO_POEM_DIRECTION`（合法出口，不编故事）。
+
+边界：本步只解决 AFFECTIVE FORMATION，**不**宣称已解决 COMPOSER REALISATION——
+方向正确仍可能写成生硬句，那属于语言实现问题，不由本步负责。
 
 ## Runtime Teaching（MINIMUM_PRODUCT_INTEGRATION_V1）
 

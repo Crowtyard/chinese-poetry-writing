@@ -31,7 +31,40 @@ INPUT
 - Formation 产物**不得**自动否决已带 stake 的 Direct Discovery（历史上有真人选 Direct 胜出的样本）。
 - 本节点不改变后续步骤编号；跳过时流水线行为与 v0.1-beta 一致。
 
+### 步骤 0.5 · AFFECTIVE INTENT（写作准备步骤，非 Gate）
+
+```text
+（PREMISE STATUS CHECK 之后）
+↓
+AFFECTIVE INTENT —— 只回答三问：
+  ① 这个具体题材／处境中，真正触动人的是什么？
+  ② 从这个处境自然生长出来的主要思想感情是什么？
+  ③ 哪些事实、动作、关系、物象能够承载这种感情，而不必把感情直接解释出来？
+↓
+产物 = 一句内部写作方向
+├─ 自然形成 → 进入 COMPOSE（FACT／DISCOVERY／RELATION／CONCEPT 均受其约束）
+├─ 情感很轻但真实 → 同样合法，照此写，不升格、不加重
+└─ 找不到自然方向 → 可以继续寻找；仍无 → NO_POEM_DIRECTION（合法出口，不编故事）
+```
+
+- **不是 Gate**：无 PASS／FAIL，不参与通过／不通过判定，不产生阻断；产物是写作方向，不是检查表。
+- 顺序不可跳：裸题（如「凌晨便利店」）必须先形成 Premise 与情感方向，**不得**直接「找四个景物 → 拼成诗句」。
+- 已有强情境时（如「祖父去世后第一次回老家，葡萄架还在，没人坐在下面乘凉」）：`PREMISE_FORMATION = SKIP`，
+  直接进行 AFFECTIVE INTENT。方向可能自然落在怀念／物是人非，但**不得要求**诗中出现「悲」「思念」「物是人非」。
+- `AFFECTIVE_TEMPLATE_GUARD`：夜晚 ≠ 自动孤独、下雨 ≠ 自动惆怅、秋天 ≠ 自动悲凉、故乡 ≠ 自动思乡、
+  老人 ≠ 自动怀念、死亡 ≠ 自动哭诉；思想感情只能从「具体处境＋实际关系＋事实变化」自然产生。
+  这是 `premise_formation.md` 的 `EMOTION_TEMPLATE_GUARD` 在情感方向阶段的同族约束。
+- `FORCED_SIGNIFICANCE_GUARD` 对本步同样生效：不得为了「必须有思想感情」添补输入不支持的重大事实
+  （多年未归／父母去世／分手／疾病／人生遗憾／童年伤痛／身份焦虑）。
+- 情感可复合、可很轻；「思想」不等于强行上价值（人生哲理／社会寓言／命运思考／时间宏论）。
+- 本节点不改变后续步骤编号；跳过或情感很轻时，流水线行为与 v0.1-beta 一致。
+- 边界：本步只负责 AFFECTIVE FORMATION，不宣称解决 COMPOSER REALISATION（方向正确仍可能写出生硬句）。
+
 ### 主体步骤
+
+> AFFECTIVE INTENT 全程约束（步骤 2-5）：FACT／DISCOVERY／RELATION／CONCEPT
+> **优先选择能够承载当前写作方向的事实与关系**；具体但与情感无关的事实可以舍弃。
+> 反向禁止：不得为了迎合情感方向歪曲事实或增补事实。
 
 1. 解析题面；注入 Persona 声音/视角（如无 Persona，用中性视角）。
 2. COMPOSE·FACT：列可验证事实清单。

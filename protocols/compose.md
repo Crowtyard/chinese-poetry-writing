@@ -7,6 +7,23 @@
 
 FACT → IRREPLACEABLE_FACT → DISCOVERY（≥3）→ RELATION（选定）→ 2-3 CONCEPTS → DRAFT
 
+## 输入契约：AFFECTIVE INTENT（思想感情方向）
+
+起草前必须已经有一句内部写作方向（三问见 `protocols/orchestration.md` 步骤 0.5）：
+本诗准备承载什么感受或认识，以及哪些事实、动作、关系能承载它。
+没有它就没有 FACT 的取舍标准，写出来的就是「与题目有关的景物陈列」。
+
+- 它影响的是：注意什么 / 选什么 / 舍什么 / 关系怎么组织 / 诗在哪里停；
+  **不是**把「悲伤／孤独／思念／惆怅」等词写进诗里（`AFFECTIVE_INTENT != EMOTION_WORDS`）。
+- 目标 `READER_FEELS_IT_BEFORE_THE_POEM_EXPLAINS_IT`：让感情从关系、动作、物象、语气、节奏、
+  留白、结尾位置里出现，不由解释句交付。
+- 下列步骤（FACT／DISCOVERY／RELATION／CONCEPT）**优先选择能承载该方向的事实与关系**；
+  具体但与情感无关的事实可以舍弃。
+- 反向禁止：不得为了迎合情感方向歪曲或添加事实，也不得添补输入不支持的重大事实
+  （`FORCED_SIGNIFICANCE_GUARD`）。
+- 情感很轻是合法的：方向可以只是一点语气或一点不舍，不必强行加重；找不到自然方向时按失败处理
+  （换题或如实报告），不硬贴模板（`AFFECTIVE_TEMPLATE_GUARD`）。
+
 ### 1. FACT（事实清单）
 
 只列可验证事实：人物、动作、物件、声音、光线、空间、时间变化。
