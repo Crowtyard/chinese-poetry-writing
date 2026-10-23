@@ -1,9 +1,25 @@
 # Chinese Poetry Writing
 
-> 中文诗歌创作 Skill。把「选材 → 思想感情方向 → 发现 → 成诗 → 批评 → 修订 → 验律」拆成可追踪的流程，
+> 中文诗歌创作与原文查询 Skill。把「选材 → 思想感情方向 → 发现 → 成诗 → 批评 → 修订 → 验律」拆成可追踪的流程，
 > 并把真人审美反馈与失败案例蒸馏为**运行时校准资产**，而不是一叠写作口诀。
 
-`v0.1-beta`｜`REAL_USER_BETA`｜main 已集成 Affective Intent V1（写作前的思想感情方向）+ Minimum Product Integration V1（条件式 Premise Formation + 带证据门槛的 Critic 运行时校准）
+`v0.4-beta`｜`REAL_USER_BETA`｜新增本地 chinese-poetry 原文库查询与参考创作，保留既有写作、批评、修订及独立验律流程。
+
+v0.4 学习 [Wscats/poetry-skills](https://github.com/Wscats/poetry-skills) 将轻量 Skill 与外部 JSON
+语料分开准备、按作者/标题/词牌/正文查找的方式，接入 [chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)。
+新增可执行的只读 SQLite 查询、简繁兼容检索和固定版本来源追溯，原库与索引放在 Skill 仓库之外。
+当前实际索引 14 类文集、346,097 条作品/章节记录；条目可能重复，不称为去重诗歌首数。
+170 条空正文单独记录，不计入可检索原文。用法与覆盖边界见[原文库联动](references/corpus_retrieval.md)。
+
+v0.3 参考 [ALDIFS/Poetry-meter-skill](https://github.com/ALDIFS/Poetry-meter-skill)，将一般写作思路
+独立整理为[成稿与推敲](references/craft_revision.md)，接入起草、批评、修订和修律后的复查。
+侧重关键动词、自然句法、视点与虚实、典故的语义轻重，不规定古语、器官、意象数量或结尾形式。
+新方法尚未经真人盲评，不能据此声称成诗质量已提高；来源与未采用的部分见[来源记录](references/sources.md)。
+
+v0.2 借鉴 [rhyme-checker](https://github.com/wb14123/rhyme-checker) 的查字、查谱与外部验律流程。
+现代五绝/七绝继续使用姊妹项目的原生检查；平水韵、词林正韵与词牌资料通过独立可选后端查询。
+传统词稿匹配提供待复核报告，**不声称已经实现完整传统验律**。使用边界与命令见
+[韵律体系选择](references/prosody_selection.md)。
 
 它**不是**「一个万能写诗 Prompt」。
 
@@ -45,12 +61,17 @@ chinese-poetry-prosody（独立项目·确定性验律）
 
 - **Persona**：谁在写。本 Skill 不绑定任何 Persona，也不把人设并进方法层。
 - **chinese-poetry-writing**：怎么写、怎么批、怎么改、怎么调度。
+- **chinese-poetry 原文库**：查询古人作品与用例；可作写法参考，不是韵书或审美判分器。
 - **chinese-poetry-prosody**：唯一验律方。本仓库**不**内嵌拼音表与韵书数据，也不复制其判定逻辑；成稿后调用它、按报告修律、修完复检。
 
-## 当前工作流（v0.1-beta）
+## 当前工作流（v0.4-beta）
 
 ```text
 INPUT
+ ├ 纯查诗/查作者 → 本地检索 → 阅读原文 → 带来源回答
+ └ 创作/改诗 → 需要原作参考时检索少量相关作品
+ ↓
+体裁 / 韵书选择；填词先查词谱与确切变体
  ↓
 PREMISE STATUS CHECK ← 条件式，非必经节点
  ├ 输入已含具体处境 / 关系 / stake → 跳过 Premise Formation
@@ -65,11 +86,13 @@ AFFECTIVE INTENT ← 写作准备步骤，非 Gate：先形成思想感情方向
  ↓
 FACT → IRREPLACEABLE_FACT → DISCOVERY(≥3) → RELATION → CONCEPT(2-3) → DRAFT
  ↓
+关键细节核对与朗读；需要时推敲词语、语体、布局或用典
+ ↓
 CRITIQUE（EVIDENCE / RELATION / NATURALNESS / EXPLANATION / TECHNIQUE_VISIBILITY / IRREPLACEABILITY）
  ↓
 REVISE（每处改动记录 POETIC_EYE_PRESERVED / NATURAL_SYNTAX_PRESERVED）
  ↓
-PROSODY（调用 chinese-poetry-prosody：PASS / WARN / FAIL）
+PROSODY（现代绝句：PASS / WARN / FAIL；传统：外部资料与匹配复核；自由诗不套绝句）
  ↓
 修律 → 复检（只动违规处，最多 5 轮）
  ↓
@@ -145,13 +168,38 @@ Premise 解决「为什么这个具体处境值得写」；Affective Intent 解�
 点评这首诗：它最实质的问题是哪一句？（允许回答「没有实质问题」）
 
 写一首关于雨后操场的诗。
+
+查李白的《静夜思》，给出库内原文和出处。
+
+找几首苏轼的《水调歌头》，再分析其中如何处理时间变化。
+
+比较李白和杜甫写月的具体句法，参考这种方法写我的经历，不引用原句。
 ```
 
 对「雨后操场」这类题目，Skill 不会自动写「雨 → 忧伤、空场 → 孤独」；它会先寻找这个处境中真正值得写的关系、变化或感受方向，按「具体处境 → premise → affective direction → facts / relations → draft」的顺序推进，而不是从题材标签直接跳到景物拼接。
 
 - **只想验律**（查押韵、平仄、韵部、某诗是否合律）→ 直接交给 chinese-poetry-prosody，不进入创作流程。
 - 内部分析（FACT 清单、DISCOVERY 过程、批评记录、修律中间版本）默认**不**展示，只交付诗与必要说明；需要时明确要求展开。
-- 安装：本仓库本身就是 Skill 目录，把它放进你所用的客户端 Skill 路径即可（Codex 个人级 Skill 目录形如 `$HOME/.agents/skills/<skill-name>/`）。仓库内 `agents/openai.yaml` 提供客户端展示名与默认提示。本仓库没有自动安装脚本，也没有发布到任何技能市场。
+- 安装 Skill：把本仓库放进客户端 Skill 路径，或让 Agent 直接读取当前检出的 SKILL.md。
+  Codex 个人路径形如 `$HOME/.agents/skills/<skill-name>/`；`agents/openai.yaml` 提供展示名与默认提示。
+  本项目未发布到技能市场。可选原文库另用下列安装脚本准备。
+
+### 准备及查询本地原文库
+
+在本仓库根目录执行：
+
+```bash
+python3 scripts/setup_poetry_library.py
+python3 scripts/poetry_library.py search --author 李白 --title 静夜思
+python3 scripts/poetry_library.py search --collection song-ci --author 苏轼 --rhythmic 水调歌头 --limit 3
+python3 scripts/poetry_library.py search --collection lunyu --keyword 梦见周公
+```
+
+数据库固定版本安装在仓库外，保留上游 LICENSE；查询离线、只读。
+默认在云环境使用 `/workspace/shared/poetry-tools/corpus`，可设置 `POETRY_CORPUS_HOME`。
+简繁只归一化检索字段，返回原文与来源，不把常见版本覆盖原库异文。
+纯查询不运行创作或验律；参考创作只取具体写作方法，不把旧诗内容移植成用户经历。
+它是字面检索与按需阅读，不是模型训练、全自动典故解释或语义搜索。
 
 ## 姊妹项目：chinese-poetry-prosody
 
@@ -159,12 +207,13 @@ Premise 解决「为什么这个具体处境值得写」；Affective Intent 解�
 
 - **确定性**：拼音、声调、平仄、现代韵（中华新韵十八韵／十四韵、十三辙、听感近韵）、联内相对、联间相粘、韵脚与整诗扫描，全部由数据 + 程序计算。
 - 以**现代普通话**为准，不是历史音韵学系统。
-- 报告 `PASS` / `WARN` / `FAIL`，退出码 `0` / `1` / `2`；`WARN` 是提示，`FAIL` 必须修改对应句后复检。
+- 原生现代检查报告 `PASS` / `WARN` / `FAIL`，退出码 `0` / `1` / `2`；`WARN` 是提示，确定 `FAIL` 修改后复检。
+- 可选传统接口另有查询与复核契约：查询成功不代表合律，词稿匹配始终待复核；不认证传统整诗 PASS。
 - **它只判格律，不做审美判断**：验律通过不代表诗成立。
 
 ```bash
 # 在 chinese-poetry-prosody 仓库根目录执行（用法以其 README / SKILL.md 为准）
-py scripts/check_poem.py --poem "<诗>" --form jueju7 [--reading 行:列=拼音] [--rhyme-profile xinyun18]
+python3 scripts/check_poem.py --poem "<诗>" --form jueju7 [--reading 行:列=拼音] [--rhyme-profile xinyun18]
 ```
 
 ## 项目结构
@@ -180,7 +229,9 @@ chinese-poetry-writing/
 ├── references/           # 判据速查（发现 / 关系 / 留白 / 结尾 / 坏诗模式 / 软偏好层）
 │   └── runtime_teaching/ # 通过证据门槛的运行时校准资产（critic 对照・声学诊断・案例索引・Premise Formation）
 ├── examples/             # 真人裁决样本（获认可 / 失败），可学不可抄
-└── tests/                # 冒烟用例清单（v0.1-beta 验收）
+├── scripts/              # 可选语料安装、建索引与只读检索
+├── requirements-corpus.txt # 仅原文库工具的可选依赖
+└── tests/                # 检索软件测试、实际查询记录及原有审美冒烟用例
 ```
 
 ## 证据与真人反馈
@@ -211,8 +262,10 @@ chinese-poetry-writing/
 
 ## 版本与状态
 
-- version：`v0.1-beta`
+- version：`v0.4-beta`
 - status：`REAL_USER_BETA`
 - main：已集成 Affective Intent V1 —— 写作前的思想感情方向（pre-composition、非 Gate）；以及 Minimum Product Integration V1 —— 条件式 Premise Formation + 带证据门槛的 Critic 运行时校准
 - 验收：`tests/smoke_cases.md` 共 10 题冒烟用例，走完整端到端流程（COMPOSE → CRITIQUE → REVISE → PROSODY → FINAL CHECK），题材覆盖现代／古典自然／离别／日常／人物／城市
+- 原文库工具：22 项自动测试通过；实际原库查询及来源回查记录见 `tests/corpus_smoke_results.md`。
+  此为检索功能验证，不替代上述 10 题审美验收，也不证明成诗质量提高。
 - Beta 的含义：提供已验证的方法，**不**宣称审美模型已经客观完备。

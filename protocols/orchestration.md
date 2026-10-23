@@ -10,6 +10,21 @@
 
 ## 标准工作流（前置条件检查 + 11 步）
 
+### 意图路由与可选原文检索
+
+- 纯查诗、查作者、找原句：按 `references/corpus_retrieval.md` 使用本地库，带来源回答即结束；
+  不进入创作、批评或验律。纯声韵问题仍交给 prosody。
+- 创作/修订若要求参考某诗人、比较风格、使用典故或核对出处，先查少量相关原作，读实际结果再提炼方法。
+- 已有处境不因读到原作而被替换；不移植原作人物、事件或情绪。无资料需求时不强制检索。
+- 关键词查找是字面检索，不保证语义召回。无结果、缺库或损坏明确报告，不捏造原文。
+
+### 创作参数 · 体裁、韵书与词谱
+
+先读 `references/prosody_selection.md`。提取用户已指定的体裁与韵书；未指定韵书的五绝/七绝
+保留现代新韵十八韵默认，输出注明规则。传统填词通常采用词林正韵，先调用姊妹项目
+`traditional_prosody.py cipai` 查询词牌，选择确切变体后再安排句式。不因检测结果换体系。
+自由诗不套绝句检查；传统诗词不拿现代声调当古音；程序暂不支持的整诗认证如实标记待复核。
+
 ### 步骤 0 · PREMISE STATUS CHECK（条件式，非必经 Gate）
 
 ```text
@@ -67,16 +82,18 @@ AFFECTIVE INTENT —— 只回答三问：
 > 反向禁止：不得为了迎合情感方向歪曲事实或增补事实。
 
 1. 解析题面；注入 Persona 声音/视角（如无 Persona，用中性视角）。
-2. COMPOSE·FACT：列可验证事实清单。
+2. COMPOSE·FACT：列可验证事实清单，内部标出需保留的重要人物、动作方向、醒梦/时间边界及两三项关键细节。
 3. COMPOSE·IRREPLACEABLE_FACT：三问定位不可替换事实（找不到→回 2 或换题）。
 4. COMPOSE·DISCOVERY：产 3 个真不同发现。
 5. COMPOSE·CONCEPTS：选 2-3 个完整构思 → 定 1 个主构思。
-6. COMPOSE·DRAFT：按语言纪律成稿（可出 1-2 个候选）。
+6. COMPOSE·DRAFT：按语言纪律成稿（可出 1-2 个候选）；核对关键细节并朗读。
+   用过原文参考时区分引用与原创，不把资料中的事实覆盖用户素材；必要时复核疑似沿用的原句。
+   如需炼字、布景或用典，按 `references/craft_revision.md` 取相关小节；不新增 Gate 或强制古语/画面结尾。
 7. CRITIQUE：按批评协议过六项优先检查 + 补查；记录问题到句，并显式落三档判决之一（见下「Critic Runtime Loading」）。
 8. REVISE：按修改协议修（每处记录 POETIC_EYE / NATURAL_SYNTAX 两字段）。
-9. 调用 chinese-poetry-prosody 验律（PASS/WARN/FAIL + 退出码；按报告行事，不自行判韵）。
-10. 修律：只动违规处，≤5 轮，复检至 PASS 或如实报告冲突。
-11. FINAL AESTHETIC CHECK：修律后重过一遍 critique 六项（防"律过意伤"）→ 输出最终诗。
+9. 调用 chinese-poetry-prosody 的对应入口：现代绝句为原生 PASS/WARN/FAIL；传统为查韵、查谱和外部词稿复核；自由诗不做绝句扫描。
+10. 修律：现代确定违规只动对应处，≤5 轮；传统外部匹配始终待复核，核对资料后再决定，不凭分数或 exit 0 认证合律。无法完成的认证如实说明。
+11. FINAL AESTHETIC CHECK：修律后重过一遍 critique 六项，核对关键语义并朗读（防"律过意伤"）→ 输出最终诗。
 
 ## Critic Runtime Loading（按档位取用，不整包加载）
 
@@ -94,6 +111,10 @@ AFFECTIVE INTENT —— 只回答三问：
 - 研究仓的 teaching 单元不由本 Skill 自动读取；Orchestrator 不得因为文件存在就注入轨迹教学。
 - 既有已验证／历史支持的原则继续有效：`POETIC_EYE_PRESERVED`；修律可撤回（prosody repair may be rolled back）。
   这不等于 trajectory injection 已验证。
+
+v0.3 的 `references/craft_revision.md` 是按用户要求新增的外部写作方法参考，
+不属于上述研究侧 Composer/Reviser 教学单元，也未被标记为真人验证材料。
+其采用边界见 `references/sources.md`；完成自查不表示新方法胜过旧版。
 
 ## 循环与上限
 
@@ -117,7 +138,9 @@ AFFECTIVE INTENT —— 只回答三问：
 
 ## 验律调用契约（示例，实际以 prosody 文档为准）
 
-外部命令（在 chinese-poetry-prosody 根目录执行）：
-py scripts/check_poem.py --poem "<诗>" --form jueju5|jueju7 [--reading 字=拼音|行:列=拼音] [--rhyme-profile xinyun18]
-判定：PASS=0 / WARN=1 / FAIL=2；WARN 是提示不是硬伤，FAIL 必须修。
+现代绝句命令（在 chinese-poetry-prosody 根目录执行）：
+`python3 scripts/check_poem.py --poem "<诗>" --form jueju7 --rhyme-profile xinyun18`，五绝使用 `jueju5`，读音按需指定。
+原生现代判定：PASS=0 / WARN=1 / FAIL=2；WARN 是提示不是硬伤，确定 FAIL 需要修订。
+传统查询和外部匹配命令见 `references/prosody_selection.md`；`check-ci` 返回 exit 1 与待复核报告，
+不是原生 FAIL，也不转换成 PASS。未安装后端应标记传统验律未完成。
 本 Skill 不复制、不解释其内部韵书逻辑；多音字等歧义以 --reading 如实锁定，不猜测。

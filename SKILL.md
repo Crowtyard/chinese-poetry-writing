@@ -1,20 +1,27 @@
 ---
 name: chinese-poetry-writing
-description: 中文诗歌创作方法 Skill，负责中文诗歌的构思、创作、批评、修订与全流程调度；适用于写诗、作诗、五绝、七绝、古诗、格律诗、命题诗、润色诗、改诗、点评诗稿等请求。仅查询押韵、平仄、韵部、合律或多音字读音时，应交给 chinese-poetry-prosody。
+description: 中文诗歌创作、批评、修订与原文查询 Skill。可按作者、标题、正文关键词、文集或词牌检索本地 chinese-poetry 原文库，带来源参考古人写法与比较风格；适用于写诗、填词、改诗、点评、查诗、找名句、查作者。纯声韵与格律问题交给 chinese-poetry-prosody。
 metadata:
-  version: "0.1-beta"
+  version: "0.4-beta"
 ---
 
-# chinese-poetry-writing —— 中文诗歌创作方法 Skill（v0.1-beta）
+# chinese-poetry-writing —— 中文诗歌创作、查询与修订 Skill（v0.4-beta）
 
 ## 名称与版本
 
 - skill_name: chinese-poetry-writing
-- version: v0.1-beta
+- version: v0.4-beta
 - 性质：BETA。提供已验证的方法，不宣称审美模型已经客观完备。
-- 集成状态：v0.1-beta + MINIMUM_PRODUCT_INTEGRATION_V1 + AFFECTIVE_INTENT_FLOW_V1（运行时教学资产已接入
+- 集成状态：保留 v0.1-beta 的 MINIMUM_PRODUCT_INTEGRATION_V1 + AFFECTIVE_INTENT_FLOW_V1（运行时教学资产已接入
   `references/runtime_teaching/`，接入范围与档位见「Runtime Teaching」一节；主流程新增
   AFFECTIVE INTENT 写作准备步骤，见「AFFECTIVE INTENT（思想感情方向）」一节）。
+- v0.2 新增：创作前选择体裁、韵书、词谱变体；接入姊妹项目的可选传统查询与词稿复核。
+  未新增传统整诗合律认证，详见 `references/prosody_selection.md`。
+- v0.3 新增：参考 ALDIFS/Poetry-meter-skill，加入关键细节保留、语体组织、炼字、
+  视点与虚实核对、按需用典和朗读推敲；详见 `references/craft_revision.md`。
+  这些是待真人验证的参考方法，不是新增真人教学资产；来源及取舍见 `references/sources.md`。
+- v0.4 新增：参考 Wscats/poetry-skills 的本地 JSON 联动，接入独立 chinese-poetry 原文库，
+  提供可执行的查询、简繁匹配、作者资料及来源追溯，详见 `references/corpus_retrieval.md`。
 
 ## 职责（COMPOSE / CRITIQUE / REVISE / ORCHESTRATE）
 
@@ -22,6 +29,7 @@ metadata:
 - CRITIQUE：如何批评诗稿（自查与他评共用同一纪律）。
 - REVISE：如何修改（先保什么、后动什么、何时回退）。
 - ORCHESTRATE：全流程调度、迭代上限、输出纪律。
+- QUERY：检索原作、作者资料和用例；为需要参考原作的创作提供可追溯材料，不代替验律。
 
 本 Skill 不绑定任何具体 Persona。小光、Kun 及其他角色均可调用。
 
@@ -36,15 +44,25 @@ metadata:
 ## 触发条件
 
 用户要求以下任一时可加载本 Skill：
-写诗、作诗、写五绝、写七绝、写古诗、写格律诗、命题诗、润色诗、改诗、批评/点评诗稿、要求完整创作工作流。
+写诗、作诗、填词、写五绝、写七绝、写古诗、写格律诗、命题诗、润色诗、改诗、批评/点评诗稿、
+查诗、按作者/标题/词牌找诗、查名句或典故用例、比较诗人表达，以及完整创作工作流。
 
 以下情况**不**进入创作流程，优先转交 chinese-poetry-prosody：
 仅查询押韵、查平仄、查韵部、验某诗是否合律、多音字读音——由 chinese-poetry-prosody 处理。
 
 ## 调度流程（ORCHESTRATE）
 
+先区分意图：纯查诗/查作者走 QUERY；纯声韵查询走 prosody；创作、点评、修订走原流程。
+用户要求参考古人、风格比较、典故用例或核对出处时，先按需读 `references/corpus_retrieval.md`，
+执行实际查询再分析。普通创作不强制查库，不将整个数据库加载进上下文。
+
 ```
 USER_REQUEST
+↓
+INTENT → 纯查询：检索原库 → 带来源回答（不进入创作/验律）
+       → 创作/改诗：需要原作参考时先查询少量相关作品
+↓
+FORM / RHYME SYSTEM（先明确体裁、韵书；填词先查词谱和确切变体）
 ↓
 PREMISE STATUS CHECK（条件式，非必经 Gate；细则见 protocols/orchestration.md 步骤 0）
   输入已含具体处境／关系／stake → 继续（跳过 Formation）
@@ -64,15 +82,16 @@ COMPOSE（FACT / DISCOVERY / RELATION / CONCEPT 均受 AFFECTIVE INTENT 约束�
   RELATION
   CONCEPTS（2-3）
   DRAFT
+  核对关键关系与细节；朗读；按需要推敲语体、词语、布局或用典
 ↓
 CRITIQUE（EVIDENCE / RELATION / NATURALNESS / EXPLANATION /
          TECHNIQUE_VISIBILITY / IRREPLACEABILITY）
 ↓
 REVISE
 ↓
-调用 chinese-poetry-prosody 验律
+调用 chinese-poetry-prosody 对应入口（现代绝句检查 / 传统资料与词稿外部复核 / 自由诗不套绝句）
 ↓
-如格律有问题 → REVISE（只动违规处，保诗眼）→ 复检
+现代检查有确定违规 → 修订并复检；传统外部提示 → 先核对资料，不直接判必改
 ↓
 FINAL_AESTHETIC_CHECK（修律后重过 CRITIQUE 核心项）
 ↓
@@ -81,6 +100,26 @@ OUTPUT
 
 - 内部分析（FACT/DISCOVERY/CRITIQUE 过程）默认不展示给用户；仅输出诗与必要说明。
 - 迭代上限：构思 ≤3 轮；批评-修订 ≤3 轮；修律 ≤5 轮。不收敛则如实报告 UNRESOLVED。
+
+## 原文查询与参考（v0.4）
+
+- 首次准备：在本仓库根目录运行 `python3 scripts/setup_poetry_library.py`；原库与索引放在仓库之外，
+  固定版本、保留 LICENSE；刷新与路径参数见 `references/corpus_retrieval.md`。
+- 查询示例：`python3 scripts/poetry_library.py --json search --author 李白 --keyword 明月 --limit 3`。
+  宋词用 `--rhythmic` 查词牌，不把词牌当独立题名；支持简繁匹配，展示保留原文。
+- 引用实际返回的作者、标题/词牌、完整正文及来源；不捏造结果、把本页当全部，或把字面关键词当语义标签。
+- 创作时只借鉴适合本次处境的句法、布局与关系方法，核对用典，不照搬原句或原作事件。
+- 原库、注释及其 `strains` 不替代韵书/词谱，库内命中不是格律认证或审美背书。
+  软件测试也不证明新创作质量更好。查询未完成时说明，不靠记忆冒充查库。
+
+## 成稿与推敲（v0.3）
+
+- 起草前用一行内部记录保留重要人物、动作方向、时间/醒梦边界及两三项关键细节；不要求穷尽事实。
+- 起草后核对这些内容是否仍可读出，并朗读整句；需要修词、布景或用典时按需取
+  `references/craft_revision.md` 对应小节。保持现有 Critic 六项与三档判决，不增设评分或 Gate。
+- 传统语体可凝练，现代题材可保留现代词；不把“像古诗”作为删去经历特征的理由。
+- 用典先核对本义、出处与当前关系；普通朋友不自动写成生死知音，不能把梦中来信变成现实来信。
+- 修词与修律后再核对关键语义。听觉自查不代替程序验律，形式 PASS 不抵消素材丢失。
 
 ## AFFECTIVE INTENT（思想感情方向 / AFFECTIVE_INTENT_FLOW_V1）
 
@@ -152,10 +191,16 @@ OUTPUT
 
 ## Prosody 集成
 
-- 完成审美稿后调用已安装的 `chinese-poetry-prosody`；个人级 Codex Skill 默认放在 `$HOME/.agents/skills/chinese-poetry-prosody/`。
-- 调用方式（以其 SKILL.md 为准）：
-  `py scripts/check_poem.py --poem "<诗>" [--form jueju5|jueju7] [--reading 行:列=拼音] [--rhyme-profile xinyun18]`
-- 判定：PASS 可交付；WARN 按提示决定是否处理；FAIL 必须修订对应句后复检。
+- 先按 `references/prosody_selection.md` 选择体系；采用用户指定条件，不为通过检查暗换韵书。
+- 完成审美稿后调用 `chinese-poetry-prosody` 的实际检出/安装路径，不假定个人目录存在。
+- 现代五绝/七绝在姊妹仓库根目录执行：
+  `python3 scripts/check_poem.py --poem "<诗>" [--form jueju5|jueju7] [--reading 行:列=拼音] [--rhyme-profile xinyun18]`。
+  未指定韵书的绝句保留现代十八韵默认，并注明“现代普通话简化规则”。
+- 传统查韵、查词谱、词稿外部匹配调用 `traditional_prosody.py`；填词先查询确切词牌与变体。
+  外部匹配始终 WARN / EXTERNAL_REVIEW_REQUIRED，不提供传统整诗 PASS。缺后端或资料时说明未完成验律。
+- 自由诗不运行绝句扫描。古人作品或传统规则请求，不用现代普通话声调代替古音平仄。
+- 原生现代判定：PASS 可交付但不代表审美合格；WARN 按提示决定；确定 FAIL 修订后复检。
+  传统外部提示须核对字表覆盖、语境读音、词谱变体及典籍后再决定，不自动改古人作品。
 - 本 Skill 不复制、不内嵌 Prosody 的拼音/平仄/押韵/相对/相粘/韵部判定逻辑，不复制 chars.json；
   不修改 chinese-poetry-prosody。LLM 不自行猜判声韵，一切以脚本报告为准。
 
@@ -178,3 +223,8 @@ OUTPUT
   failure_index_retrieval.md｜premise_formation.md —— 运行时教学资产（按档位取用，不整包加载）
 - examples/liked_examples.md｜failure_examples.md —— 真人裁决样本（可学不可抄）
 - tests/smoke_cases.md —— 冒烟用例清单（v0.1-beta 验收）
+- references/prosody_selection.md —— 体裁、韵书、词谱变体选择与外部复核边界（v0.2）
+- references/craft_revision.md —— 成稿、语体、炼字、布局、用典与朗读（v0.3；按需读取）
+- references/sources.md —— 外部参考版本、采用范围与证据边界
+- references/corpus_retrieval.md —— 原文库安装、查询、风格参考与引用边界（v0.4）
+- scripts/setup_poetry_library.py / poetry_library.py —— 独立数据准备与只读检索工具

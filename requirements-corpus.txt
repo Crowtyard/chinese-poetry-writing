@@ -1,0 +1,2 @@
+# Optional local corpus tools only; writing prompts need no Python packages.
+opencc-python-reimplemented==0.1.7
