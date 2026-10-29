@@ -225,6 +225,7 @@ OUTPUT
 - tests/smoke_cases.md —— 冒烟用例清单（v0.1-beta 验收）
 - references/prosody_selection.md —— 体裁、韵书、词谱变体选择与外部复核边界（v0.2）
 - references/craft_revision.md —— 成稿、语体、炼字、布局、用典与朗读（v0.3；按需读取）
+- references/revision_examples.md —— 完成状态、事实增补、动作先后及修律退步的具体对照（按问题取例）
 - references/sources.md —— 外部参考版本、采用范围与证据边界
 - references/corpus_retrieval.md —— 原文库安装、查询、风格参考与引用边界（v0.4）
 - scripts/setup_poetry_library.py / poetry_library.py —— 独立数据准备与只读检索工具
