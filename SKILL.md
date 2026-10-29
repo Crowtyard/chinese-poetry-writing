@@ -2,15 +2,15 @@
 name: chinese-poetry-writing
 description: 中文诗歌创作、批评、修订与原文查询 Skill。可按作者、标题、正文关键词、文集或词牌检索本地 chinese-poetry 原文库，带来源参考古人写法与比较风格；适用于写诗、填词、改诗、点评、查诗、找名句、查作者。纯声韵与格律问题交给 chinese-poetry-prosody。
 metadata:
-  version: "0.4-beta"
+  version: "0.4.1"
 ---
 
-# chinese-poetry-writing —— 中文诗歌创作、查询与修订 Skill（v0.4-beta）
+# chinese-poetry-writing —— 中文诗歌创作、查询与修订 Skill（v0.4.1）
 
 ## 名称与版本
 
 - skill_name: chinese-poetry-writing
-- version: v0.4-beta
+- version: v0.4.1
 - 性质：BETA。提供已验证的方法，不宣称审美模型已经客观完备。
 - 集成状态：保留 v0.1-beta 的 MINIMUM_PRODUCT_INTEGRATION_V1 + AFFECTIVE_INTENT_FLOW_V1（运行时教学资产已接入
   `references/runtime_teaching/`，接入范围与档位见「Runtime Teaching」一节；主流程新增
@@ -22,6 +22,8 @@ metadata:
   这些是待真人验证的参考方法，不是新增真人教学资产；来源及取舍见 `references/sources.md`。
 - v0.4 新增：参考 Wscats/poetry-skills 的本地 JSON 联动，接入独立 chinese-poetry 原文库，
   提供可执行的查询、简繁匹配、作者资料及来源追溯，详见 `references/corpus_retrieval.md`。
+- v0.4.1 修复：Windows 原文库安装/解释器回退路径、测试 SQLite 连接清理；
+  补充事实保留与自然修订对照、平台回归及评阅材料，未新增体裁或传统整诗认证。
 
 ## 职责（COMPOSE / CRITIQUE / REVISE / ORCHESTRATE）
 

@@ -3,7 +3,9 @@
 > 中文诗歌创作与原文查询 Skill。把「选材 → 思想感情方向 → 发现 → 成诗 → 批评 → 修订 → 验律」拆成可追踪的流程，
 > 并把真人审美反馈与失败案例蒸馏为**运行时校准资产**，而不是一叠写作口诀。
 
-`v0.4-beta`｜`REAL_USER_BETA`｜新增本地 chinese-poetry 原文库查询与参考创作，保留既有写作、批评、修订及独立验律流程。
+`v0.4.1`｜`REAL_USER_BETA`｜修复原文库 Windows 路径与测试资源清理，补充事实保留和修订对照。
+
+本次为补丁更新，变更与验证边界见 [CHANGELOG](CHANGELOG.md)；未新增体裁或传统整诗认证。
 
 v0.4 学习 [Wscats/poetry-skills](https://github.com/Wscats/poetry-skills) 将轻量 Skill 与外部 JSON
 语料分开准备、按作者/标题/词牌/正文查找的方式，接入 [chinese-poetry](https://github.com/chinese-poetry/chinese-poetry)。
@@ -64,7 +66,7 @@ chinese-poetry-prosody（独立项目·确定性验律）
 - **chinese-poetry 原文库**：查询古人作品与用例；可作写法参考，不是韵书或审美判分器。
 - **chinese-poetry-prosody**：唯一验律方。本仓库**不**内嵌拼音表与韵书数据，也不复制其判定逻辑；成稿后调用它、按报告修律、修完复检。
 
-## 当前工作流（v0.4-beta）
+## 当前工作流（v0.4.1）
 
 ```text
 INPUT
@@ -262,10 +264,12 @@ chinese-poetry-writing/
 
 ## 版本与状态
 
-- version：`v0.4-beta`
+- version：`v0.4.1`
 - status：`REAL_USER_BETA`
 - main：已集成 Affective Intent V1 —— 写作前的思想感情方向（pre-composition、非 Gate）；以及 Minimum Product Integration V1 —— 条件式 Premise Formation + 带证据门槛的 Critic 运行时校准
 - 验收：`tests/smoke_cases.md` 共 10 题冒烟用例，走完整端到端流程（COMPOSE → CRITIQUE → REVISE → PROSODY → FINAL CHECK），题材覆盖现代／古典自然／离别／日常／人物／城市
-- 原文库工具：22 项自动测试通过；实际原库查询及来源回查记录见 `tests/corpus_smoke_results.md`。
+- 原文库工具：本次 Linux 上 27 项自动测试通过、无跳过（既有 22 项加平台回归 5 项）；
+  全新目录安装、建库和解释器回退验证通过。Windows 原生运行仍待 CI 实测。
+  v0.4 的实际原库查询及来源回查记录见 `tests/corpus_smoke_results.md`。
   此为检索功能验证，不替代上述 10 题审美验收，也不证明成诗质量提高。
 - Beta 的含义：提供已验证的方法，**不**宣称审美模型已经客观完备。
