@@ -3,7 +3,7 @@
 Run with the optional corpus venv to exercise simplification and SQL integration.
 Without OpenCC the pure adapter tests run and integration cases explicitly skip.
 """
-from contextlib import redirect_stdout
+from contextlib import closing, redirect_stdout
 import hashlib
 import importlib.util
 import io
@@ -180,15 +180,17 @@ class TestLibraryQueries(unittest.TestCase):
 
     def test_index_normalizer_change_is_not_treated_as_no_matches(self):
         self.db.close()
-        with sqlite3.connect(self.path) as db:
-            db.execute("UPDATE metadata SET value = ? WHERE key = 'normalizer'", (json.dumps("different normalizer"),))
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                db.execute("UPDATE metadata SET value = ? WHERE key = 'normalizer'", (json.dumps("different normalizer"),))
         with self.assertRaises(lib.LibraryError):
             lib.connect_readonly(self.path)
 
     def test_incomplete_metadata_is_explicit_error_not_empty_library(self):
         self.db.close()
-        with sqlite3.connect(self.path) as db:
-            db.execute("DELETE FROM metadata WHERE key = 'revision'")
+        with closing(sqlite3.connect(self.path)) as db:
+            with db:
+                db.execute("DELETE FROM metadata WHERE key = 'revision'")
         output = io.StringIO()
         with redirect_stdout(output):
             code = lib.main(["--home", str(self.home), "--json", "status"])

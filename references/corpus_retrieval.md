@@ -30,8 +30,12 @@ python3 scripts/poetry_library.py --json status
 
 默认安装位置是云环境的 `/workspace/shared/poetry-tools/corpus`，其他机器使用个人数据目录。
 可以设置 `POETRY_CORPUS_HOME`，或给两个脚本传 `--home /path/to/corpus`（放在子命令前）。
-查询脚本会在系统 Python 缺少可选依赖时使用该目录的 `venv/bin/python`；
-也可显式用这个虚拟环境的 Python 运行。
+查询脚本会在系统 Python 缺少可选依赖时使用该目录的虚拟环境：
+Linux/macOS 为 `venv/bin/python`，Windows 为 `venv/Scripts/python.exe`；
+也可显式用这个虚拟环境的 Python 运行。Windows 可将示例中的 `python3` 换成 `python`。
+跨平台全新安装验收为 `python tests/smoke_fresh_install.py`，会下载完整原库、建库、
+复用安装、运行全部测试并从不含 OpenCC 的解释器查询简繁题名；需要网络及足够磁盘空间。
+GitHub Actions 的 `Corpus Windows and Linux` 工作流执行同一验收；以实际运行结果为准。
 安装器固定语料提交 `b8594f81a89752241442f2ce267d6f66f96704ee`，
 保留上游 Git 元数据和 LICENSE，不将原库复制进本 Skill 仓库。
 已有来源、版本或文件改动不符时停止，不重置用户数据。

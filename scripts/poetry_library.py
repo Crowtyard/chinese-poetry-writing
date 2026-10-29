@@ -55,6 +55,16 @@ def default_home():
     return Path(os.environ.get("POETRY_CORPUS_HOME", default)).expanduser()
 
 
+def venv_python(environment, platform=None):
+    """Interpreter in a standard venv; do not resolve its POSIX symlink.
+
+    An explicit platform lets regression tests cover Windows on POSIX without
+    replacing os.name (which would also change pathlib's concrete path type).
+    """
+    platform = os.name if platform is None else platform
+    return Path(environment) / ("Scripts/python.exe" if platform == "nt" else "bin/python")
+
+
 class Normalizer:
     def __init__(self):
         try:
@@ -416,7 +426,7 @@ def ensure_optional_python(home):
             return
     except (ImportError, importlib.metadata.PackageNotFoundError):
         pass
-    python = home / "venv/bin/python"
+    python = venv_python(home / "venv")
     if python.is_file() and python.absolute() != Path(sys.executable).absolute():
         os.execv(str(python), [str(python), str(Path(__file__).resolve()), *sys.argv[1:]])
 

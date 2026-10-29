@@ -9,7 +9,7 @@ import subprocess
 import sys
 import venv
 
-from poetry_library import CORPUS_URL, CORPUS_REVISION, LibraryError, default_home, verify_source, connect_readonly, read_metadata
+from poetry_library import CORPUS_URL, CORPUS_REVISION, LibraryError, default_home, verify_source, connect_readonly, read_metadata, venv_python
 
 
 def main(argv=None):
@@ -34,7 +34,7 @@ def main(argv=None):
     environment = home / "venv"
     if not environment.exists():
         venv.EnvBuilder(with_pip=True).create(environment)
-    python = environment / "bin/python"
+    python = venv_python(environment)
     if not python.is_file():
         raise LibraryError("依赖目录已存在但没有 Python，未覆盖；请更换 --home。")
     requirements = own_root / "requirements-corpus.txt"
